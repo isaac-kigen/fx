@@ -1,0 +1,10 @@
+node_modules
+.next
+out
+.env
+.env.*
+.DS_Store
+supabase/.temp
+supabase/.branches
+supabase/.env
+supabase/.output

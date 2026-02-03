@@ -1,0 +1,18 @@
+-- Optional: scheduling via pg_cron + pg_net (run in Supabase SQL editor)
+-- Ensure extensions enabled in Supabase dashboard.
+-- select cron.schedule('ingest-h1', '2 * * * *', $$
+--   select net.http_post(url:='https://<project-ref>.functions.supabase.co/ingest-bars',
+--     headers:='{"Content-Type":"application/json","Authorization":"Bearer <service-role>"}');
+-- $$);
+-- select cron.schedule('validate-h1', '3 * * * *', $$
+--   select net.http_post(url:='https://<project-ref>.functions.supabase.co/validate-bars',
+--     headers:='{"Content-Type":"application/json","Authorization":"Bearer <service-role>"}');
+-- $$);
+-- select cron.schedule('signals-h1', '4 * * * *', $$
+--   select net.http_post(url:='https://<project-ref>.functions.supabase.co/generate-signals',
+--     headers:='{"Content-Type":"application/json","Authorization":"Bearer <service-role>"}');
+-- $$);
+-- select cron.schedule('notify', '* * * * *', $$
+--   select net.http_post(url:='https://<project-ref>.functions.supabase.co/notify',
+--     headers:='{"Content-Type":"application/json","Authorization":"Bearer <service-role>"}');
+-- $$);

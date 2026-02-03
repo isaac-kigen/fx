@@ -1,0 +1,4 @@
+project_id = "fx-platform"
+
+[functions]
+# List of edge functions to deploy
