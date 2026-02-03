@@ -33,7 +33,7 @@ Deno.serve(async () => {
     const vapidPrivate = Deno.env.get("VAPID_PRIVATE_KEY");
     const vapidSubject = Deno.env.get("VAPID_SUBJECT");
     if (vapidPublic && vapidPrivate && vapidSubject) {
-      configureWebPush({ publicKey: vapidPublic, privateKey: vapidPrivate, subject: vapidSubject });
+      await configureWebPush({ publicKey: vapidPublic, privateKey: vapidPrivate, subject: vapidSubject });
     }
 
     for (const event of events) {

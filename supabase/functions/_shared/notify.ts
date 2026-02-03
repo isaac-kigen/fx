@@ -1,4 +1,12 @@
-import webpush from "https://esm.sh/web-push@3.6.7";
+let webpush: any | null = null;
+
+async function getWebPush() {
+  if (!webpush) {
+    const mod = await import("https://esm.sh/web-push@3.6.7?target=deno");
+    webpush = mod.default ?? mod;
+  }
+  return webpush;
+}
 
 export async function sendTelegram(params: { token: string; chatId: string; text: string }) {
   const url = `https://api.telegram.org/bot${params.token}/sendMessage`;
@@ -34,10 +42,12 @@ export async function sendResendEmail(params: { apiKey: string; from: string; to
   return await res.json();
 }
 
-export function configureWebPush(vapid: { publicKey: string; privateKey: string; subject: string }) {
-  webpush.setVapidDetails(vapid.subject, vapid.publicKey, vapid.privateKey);
+export async function configureWebPush(vapid: { publicKey: string; privateKey: string; subject: string }) {
+  const wp = await getWebPush();
+  wp.setVapidDetails(vapid.subject, vapid.publicKey, vapid.privateKey);
 }
 
 export async function sendWebPush(params: { subscription: { endpoint: string; keys: { p256dh: string; auth: string } }; payload: Record<string, unknown> }) {
-  return await webpush.sendNotification(params.subscription, JSON.stringify(params.payload));
+  const wp = await getWebPush();
+  return await wp.sendNotification(params.subscription, JSON.stringify(params.payload));
 }
