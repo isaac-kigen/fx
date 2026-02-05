@@ -11,3 +11,9 @@ verify_jwt = false
 
 [functions.generate-signals]
 verify_jwt = false
+
+[functions.ingest-history]
+verify_jwt = false
+
+[functions.fill-missing-bars]
+verify_jwt = false

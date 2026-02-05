@@ -13,6 +13,14 @@
 --   select net.http_post(url:='https://<project-ref>.functions.supabase.co/generate-signals',
 --     headers:='{"Content-Type":"application/json","x-cron-secret":"<cron-secret>"}');
 -- $$);
+-- select cron.schedule('ingest-history-nightly', '15 0 * * *', $$
+--   select net.http_post(url:='https://<project-ref>.functions.supabase.co/ingest-history',
+--     headers:='{"Content-Type":"application/json","x-cron-secret":"<cron-secret>"}');
+-- $$);
+-- select cron.schedule('fill-missing-bars-hourly', '20 * * * *', $$
+--   select net.http_post(url:='https://<project-ref>.functions.supabase.co/fill-missing-bars',
+--     headers:='{"Content-Type":"application/json","x-cron-secret":"<cron-secret>"}');
+-- $$);
 -- select cron.schedule('notify', '* * * * *', $$
 --   select net.http_post(url:='https://<project-ref>.functions.supabase.co/notify',
 --     headers:='{"Content-Type":"application/json","Authorization":"Bearer <service-role>"}');

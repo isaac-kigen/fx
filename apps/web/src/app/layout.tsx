@@ -1,7 +1,6 @@
 import "./globals.css";
 import type { Metadata } from "next";
-import Navbar from "../components/nav/Navbar";
-import MobileNav from "../components/nav/MobileNav";
+import { ThemeRoot } from "../components/theme/theme-root";
 
 export const metadata: Metadata = {
   title: "FX Signal Ops",
@@ -10,13 +9,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body>
-        <Navbar />
-        <main>
-          {children}
-        </main>
-        <MobileNav />
+        <ThemeRoot />
+        {children}
       </body>
     </html>
   );

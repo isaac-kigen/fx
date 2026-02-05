@@ -41,11 +41,17 @@ export async function fetchTwelveDataBars(params: {
   interval: "1h" | "4h";
   outputsize: number;
   apikey: string;
+  startDate?: string;
+  endDate?: string;
+  order?: "ASC" | "DESC";
 }): Promise<TwelveResponse> {
   const url = new URL("https://api.twelvedata.com/time_series");
   url.searchParams.set("symbol", formatSymbol(params.symbol));
   url.searchParams.set("interval", params.interval);
   url.searchParams.set("outputsize", String(params.outputsize));
+  if (params.startDate) url.searchParams.set("start_date", params.startDate);
+  if (params.endDate) url.searchParams.set("end_date", params.endDate);
+  if (params.order) url.searchParams.set("order", params.order);
   url.searchParams.set("apikey", params.apikey);
   url.searchParams.set("format", "JSON");
 
