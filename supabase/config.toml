@@ -2,3 +2,12 @@ project_id = "fx-platform"
 
 [functions]
 # List of edge functions to deploy
+
+[functions.validate-bars]
+verify_jwt = false
+
+[functions.ingest-bars]
+verify_jwt = false
+
+[functions.generate-signals]
+verify_jwt = false

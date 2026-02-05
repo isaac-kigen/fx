@@ -5,7 +5,25 @@ import { startJob, finishJob } from "../_shared/job.ts";
 
 const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
-Deno.serve(async () => {
+Deno.serve(async (req) => {
+  if (req.method !== "POST") {
+    return new Response(JSON.stringify({ ok: false, error: "Method not allowed" }), {
+      status: 405,
+      headers: { "Content-Type": "application/json" }
+    });
+  }
+
+  const expectedSecret = Deno.env.get("CRON_SECRET");
+  if (expectedSecret) {
+    const suppliedSecret = req.headers.get("x-cron-secret");
+    if (suppliedSecret !== expectedSecret) {
+      return new Response(JSON.stringify({ ok: false, error: "Unauthorized" }), {
+        status: 401,
+        headers: { "Content-Type": "application/json" }
+      });
+    }
+  }
+
   const jobId = await startJob("ingest-bars");
   let rowsProcessed = 0;
   let creditsUsed = 0;

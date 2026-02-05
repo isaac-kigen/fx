@@ -5,12 +5,56 @@ import { startJob, finishJob } from "../_shared/job.ts";
 
 const tfSeconds: Record<string, number> = { H1: 3600, H4: 14400 };
 
-Deno.serve(async () => {
+const shouldSkipDueToInterval = async (
+  supabase: ReturnType<typeof createAdminClient>,
+  functionName: string,
+  minIntervalSeconds: number
+) => {
+  const { data, error } = await supabase
+    .from("job_runs")
+    .select("started_at")
+    .eq("function_name", functionName)
+    .order("started_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error || !data?.started_at) return false;
+  const elapsedMs = Date.now() - new Date(data.started_at).getTime();
+  return elapsedMs < minIntervalSeconds * 1000;
+};
+
+Deno.serve(async (req) => {
+  if (req.method !== "POST") {
+    return new Response(JSON.stringify({ ok: false, error: "Method not allowed" }), {
+      status: 405,
+      headers: { "Content-Type": "application/json" }
+    });
+  }
+
+  const expectedSecret = Deno.env.get("CRON_SECRET");
+  if (expectedSecret) {
+    const suppliedSecret = req.headers.get("x-cron-secret");
+    if (suppliedSecret !== expectedSecret) {
+      return new Response(JSON.stringify({ ok: false, error: "Unauthorized" }), {
+        status: 401,
+        headers: { "Content-Type": "application/json" }
+      });
+    }
+  }
+
+  const supabase = createAdminClient();
+  const minIntervalSeconds = Number(Deno.env.get("VALIDATE_MIN_INTERVAL_SECONDS") ?? 3000);
+  if (await shouldSkipDueToInterval(supabase, "validate-bars", minIntervalSeconds)) {
+    return new Response(JSON.stringify({ ok: true, skipped: true, reason: "rate_limited" }), {
+      status: 202,
+      headers: { "Content-Type": "application/json" }
+    });
+  }
+
   const jobId = await startJob("validate-bars");
   let rowsProcessed = 0;
 
   try {
-    const supabase = createAdminClient();
     const lookback = Number(Deno.env.get("VALIDATE_LOOKBACK") ?? 200);
 
     for (const symbol of SYMBOLS) {

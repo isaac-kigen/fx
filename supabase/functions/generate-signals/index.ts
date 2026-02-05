@@ -25,7 +25,25 @@ const fetchBars = async (supabase: ReturnType<typeof createAdminClient>, symbol:
   }));
 };
 
-Deno.serve(async () => {
+Deno.serve(async (req) => {
+  if (req.method !== "POST") {
+    return new Response(JSON.stringify({ ok: false, error: "Method not allowed" }), {
+      status: 405,
+      headers: { "Content-Type": "application/json" }
+    });
+  }
+
+  const expectedSecret = Deno.env.get("CRON_SECRET");
+  if (expectedSecret) {
+    const suppliedSecret = req.headers.get("x-cron-secret");
+    if (suppliedSecret !== expectedSecret) {
+      return new Response(JSON.stringify({ ok: false, error: "Unauthorized" }), {
+        status: 401,
+        headers: { "Content-Type": "application/json" }
+      });
+    }
+  }
+
   const jobId = await startJob("generate-signals");
   let rowsProcessed = 0;
 
